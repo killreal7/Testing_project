@@ -1,5 +1,6 @@
 import pytest
 from src.main.api.classes.api_manager import ApiManager
+from src.main.api.generators.money_generator import MoneyGenerator
 from src.main.api.models.create_user_requests import CreateUserRequest
 from src.main.api.models.deposit_account_request import DepositAccountRequest
 from src.main.api.db.crud.account_crud import AccountCrudDB as Account
@@ -14,14 +15,14 @@ class TestDepositAccount:
         deposit_account_request = DepositAccountRequest(accountId=created_account.id, amount=amount)
         response = api_manager.user_steps.deposit_account(deposit_account_request, create_user_request)
 
-        assert response.balance == initial_balance + amount
+        assert response.balance == initial_balance + amount, 'Ошибка. Неверный баланс'
 
         account_from_db = Account.get_account_by_id(db_session, response.id)
-        assert account_from_db.balance == response.balance
+        assert account_from_db.balance == response.balance, 'Ошибка. Неверный баланс'
 
 
     def test_deposit_account_by_admin(self, api_manager: ApiManager, created_account: DepositAccountRequest, db_session: Session):
-        deposit_account_request = DepositAccountRequest(accountId=created_account.id, amount=5000.0)
+        deposit_account_request = DepositAccountRequest(accountId=created_account.id, amount=MoneyGenerator.valid_deposit_amount())
         api_manager.admin_steps.deposit_account_as_admin(deposit_account_request)
 
         account_from_db = Account.get_account_by_id(db_session, created_account.id)

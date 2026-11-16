@@ -16,13 +16,13 @@ class TestCreateUser:
     def test_create_user_valid(self, api_manager:ApiManager, create_user_request: CreateUserRequest, db_session: Session):
         response = api_manager.admin_steps.create_user(create_user_request)
 
-        assert create_user_request.username == response.username
-        assert create_user_request.role == response.role
+        assert create_user_request.username == response.username, 'Ошибка в имени пользователя'
+        assert create_user_request.role == response.role, 'Ошибка в роли пользователя'
 
         user_from_db = User.get_user_by_username(db_session, create_user_request.username)
         assert user_from_db is not None, 'Созданного пользователя нет в БД'
-        assert user_from_db.username == create_user_request.username
-        assert user_from_db.role == create_user_request.role
+        assert user_from_db.username == create_user_request.username, 'Ошибка в имени пользователя'
+        assert user_from_db.role == create_user_request.role, 'Ошибка в роли пользователя'
 
     @pytest.mark.parametrize(
         "username, password",
